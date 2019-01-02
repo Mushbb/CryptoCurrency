@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html>
+<title>TEST</title>
+
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<div class="btn-group">
+    <button type="button" class="btn btn-primary" onclick=auto(200)>Next</button>
+</div>
+
+<p id="chart">
+
+<script src="d3.v5.min.js"></script>
+<script src="mush.js" charset="utf-8"></script>
+<script src="chart.js" charset="utf-8"></script>
+<script src="line.js" charset="utf-8"></script>
+<script src="board.js" charset="utf-8"></script>
+
+<script>
+	// main function
+	let b = d3.format(",.4s");
+
+	///////////////////////////////////////////
+	// set up charts
+	let chart = new Chart();
+	let line = chart.addLine("Line", 90, 50, 1500, 700);
+
+    line.refresh = 200;
+    line.duration = 200;
+    line.easing = d3.easeLinear;
+	line.up = "price";
+	line.right = "date";
+	line.logo = "id";
+	line.board = "price";
+	line.bdpos = "percent";
+	
+	let board = chart.addBoard("Board", 100, 130, 0, 0);
+	let bdwidth = 150;
+
+	//////////////////////////////////////////////////////////
+    // load files
+    let load_end,
+        records = [], ridx = [],
+        teams = [];
+
+    d3.tsv("teams.tsv").then(function(data){
+        let temp = data;
+        for(let i=0;i<temp.length;i++){
+            d3.csv(temp[i].id+".csv").then(function(data){
+                teams[temp[i].id] = [];
+                teams[temp[i].id].id = temp[i].id;
+                teams[temp[i].id].name = temp[i].name;
+                teams[temp[i].id].price = 0;
+                teams[temp[i].id].per = 0;
+                teams[temp[i].id].data = [];
+				teams[temp[i].id].max = parseFloat(temp[i].max);
+				teams[temp[i].id].maxdate = new Date(temp[i].maxdate);
+
+                records[temp[i].id] = data;
+                ridx[temp[i].id] = 0;
+            });
+        }
+
+
+    });
+
+	/////////////////////////////////////////////////////////
+    // pre-calculation
+    let beginday = new Date(2010, 6, 17),
+        endday = new Date(2018, 10, 1),
+        Price_day = [];
+
+    function pre_calculation(){
+        // skip all records until begin day
+        for(let i in teams){
+            while( (new Date(records[i][ridx[i]].timeDate)) < beginday ) ridx[i]++;
+        }
+
+        // loop everyday
+        while( beginday <= endday ){
+            // progress a day
+            Price_day[formatDate(beginday)] = [];
+            for(let i in teams){
+                Price_day[formatDate(beginday)][i] = parseFloat(records[i][ridx[i]].high);
+                ridx[i]++;
+            }
+
+            beginday.setDate(beginday.getDate()+1);
+        }
+
+        start();
+    } load_end = setTimeout(pre_calculation, 3000);
+
+    /*
+    line.begin();
+    setInterval( function(){
+        line.redraw();
+    }, 500);*/
+
+    /////////////////////////////////////////////////////////////////////////
+    // setdata
+
+    let today = new Date(2017, 0, 1),
+		formatday;
+    let standard = [];
+
+    function start(){
+        line.f_domain = new Date(today).setDate(today.getDate()-30);
+        line.fy_domain = 0;
+        beginday = new Date(today);
+
+        let tempday = new Date(today);
+        
+        ///////////////
+        // 1 phase data
+        // set standard
+		for(let i in Price_day[formatDate(tempday)]){
+			standard[i] = Price_day[formatDate(tempday)][i];
+		}
+		
+        while(tempday <= endday){
+            for(let i in Price_day[formatDate(tempday)]){
+                let temp = [];
+                temp.price = Price_day[formatDate(tempday)][i];
+                temp.date = new Date(tempday);
+
+                teams[i].data.push(temp);
+            }
+            tempday.setDate(tempday.getDate()+1);
+        }
+        let result = [];
+        for(let i in teams){
+            result[i] = teams[i];
+        }
+        line.setData(result);
+
+		board.addGroup("end", 1400, 0);
+		board.addEndText("end", "date", 0, 0);
+		
+        setData();
+        line.begin();
+    }
+
+    let max_y = 150;
+	function setData(){
+		
+        for(let i in Price_day[formatDate(today)]){
+            teams[i].price = Price_day[formatDate(today)][i];
+            teams[i].percent = Price_day[formatDate(today)][i];
+            
+            if( teams[i].percent > max_y )
+                max_y = teams[i].price;
+
+			teams[i].price = "$"+teams[i].price.toFixed(2);
+        }
+
+        if ( line.f_domain < beginday ) {
+            line.f_domain = new Date(line.f_domain);
+            line.f_domain.setDate(line.f_domain.getDate()+1);
+        }
+
+        line.l_domain = new Date(today).setDate(today.getDate());
+        line.ly_domain = max_y;
+
+		board.setText("end", "date", DisplayDate(today));
+        
+        if( today > endday )
+            return -1;
+        return 1;
+	}
+
+	let interv;
+	function auto(period){
+		if( period === undefined )
+			period = 25;
+
+		interv = setInterval(function(){
+			today.setDate(today.getDate()+1);
+
+			if( setData() === -1 )
+				clearInterval(interv);
+
+		}, period)
+	}
+
+</script>

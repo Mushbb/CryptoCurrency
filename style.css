@@ -1,0 +1,49 @@
+html {
+	background-color: black;
+}
+
+svg {
+    font: Bold 30px Arial Narrow;
+    padding-left: 70px;
+    padding-top: 30px;
+    background-color: white;
+}
+
+.chart {
+	margin-top: 0px;
+}
+
+.axis {
+	fill: none;
+	stroke: #000;
+}
+
+.x.axis line {
+	stroke: lightgray;
+}
+
+.x.axis text {
+	fill: #444444;
+	font: 25px Arial Narrow;
+}
+
+.y.axis text {
+	fill: #444444;
+	font: 25px Arial Narrow;
+}
+
+.BTC, .ETH, .XRP, .LTC, .EOS, .XLM {
+	fill: none;
+	stroke: #ffab00;
+	stroke-width: 3;
+}
+
+.stext {
+	fill: #444444;
+	font: 15px Arial Narrow;
+}
+
+.name {
+	fill: #444444;
+	font: bold 25px Arial Narrow;
+}
