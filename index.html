@@ -82,8 +82,10 @@
             // progress a day
             Price_day[formatDate(beginday)] = [];
             for(let i in teams){
-                Price_day[formatDate(beginday)][i] = parseFloat(records[i][ridx[i]].high);
-                ridx[i]++;
+                if( records[i][ridx[i]].timeDate === formatDate(beginday) ) {
+                    Price_day[formatDate(beginday)][i] = parseFloat(records[i][ridx[i]].high);
+                    ridx[i]++;
+                }
             }
 
             beginday.setDate(beginday.getDate()+1);
@@ -112,28 +114,6 @@
 
         let tempday = new Date(today);
         
-        ///////////////
-        // 1 phase data
-        // set standard
-		for(let i in Price_day[formatDate(tempday)]){
-			standard[i] = Price_day[formatDate(tempday)][i];
-		}
-		
-        while(tempday <= endday){
-            for(let i in Price_day[formatDate(tempday)]){
-                let temp = [];
-                temp.price = Price_day[formatDate(tempday)][i];
-                temp.date = new Date(tempday);
-
-                teams[i].data.push(temp);
-            }
-            tempday.setDate(tempday.getDate()+1);
-        }
-        let result = [];
-        for(let i in teams){
-            result[i] = teams[i];
-        }
-        line.setData(result);
 
 		board.addGroup("end", 1400, 0);
 		board.addEndText("end", "date", 0, 0);

@@ -28,11 +28,14 @@ class Line{
         this.fy_domain = 0;
         this.ly_domain = 100;
 
+        this.r_margin = 100;
+
         this.dots = [];
         this.dotx = [];
         this.doty = [];
 
         this.garbage = [];
+        this.g_line = [];
     }
 
     addColor(color_arr){
@@ -43,7 +46,7 @@ class Line{
         // 동일한 엔티티인지 확인하고
 		// 맞으면 뒤에다 붙이고 아니면 이전거 가비지 새거추가
 		// 데이터 갯수는 밖에서 판단하는거고 얘는 그냥 넣어주는대로 하면 됨
-		// 데이터 구조는 {id, value}
+		// 데이터 구조는 {id, data = {up, right} }[]
 
 		for(let i in this.data){
 			this.data[i].f = 0;
@@ -73,6 +76,10 @@ class Line{
 		for(let i in this.data){
 			if( this.data[i].f === 0 ){
 				// move to garbage
+				this.garbage.push(this.data[i]);
+				this.g_line.push(this.lines[this.data[i].id]);
+				this.data.splice(i, 1);
+				this.lines.splice(this.data[i].id, 1);
 			}
 		}
     }
@@ -147,6 +154,11 @@ class Line{
                     .attr("d", line(this.data[i].data));
 
         }
+
+        for(let i in this.garbage) {
+			this.g_line[this.garbage[i].id].transition().duration(this.duration).ease(this.easing)
+				.attr("d", line(this.garbage[i].data));
+		}
 
         d3.transition(this.svg).select(".x.axis").duration(this.duration).ease(this.easing)
             .call(d3.axisBottom(x).ticks(5));
