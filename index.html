@@ -110,10 +110,6 @@
     function start(){
         line.f_domain = new Date(today).setDate(today.getDate()-30);
         line.fy_domain = 0;
-        beginday = new Date(today);
-
-        let tempday = new Date(today);
-        
 
 		board.addGroup("end", 1400, 0);
 		board.addEndText("end", "date", 0, 0);
@@ -144,7 +140,9 @@
         line.ly_domain = max_y;
 
 		board.setText("end", "date", DisplayDate(today));
-        
+  
+		line.setData();
+		
         if( today > endday )
             return -1;
         return 1;
