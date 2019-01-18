@@ -28,7 +28,7 @@ class Line{
         this.fy_domain = 0;
         this.ly_domain = 100;
 
-        this.r_margin = 100;
+        this.r_margin = -100;
 
         this.dots = [];
         this.dotx = [];
@@ -53,7 +53,7 @@ class Line{
 		}
 
 		for(let i=0;i<data.length;i++){
-			if( this.data[data[i].id] !== undefined ){
+			if( this.data[data[i].id] === undefined ){
 				// make new line
 				this.data[data[i].id] = [];
 				this.data[data[i].id].push(data[i].data);
@@ -111,7 +111,7 @@ class Line{
         this.svg.append("g")
             .attr("class", "y axis")
             .call(d3.axisLeft(y).ticks(10));
-
+/*
         for(let i in this.data) {
             this.svg.append("g")
                 .append("path")
@@ -122,7 +122,7 @@ class Line{
                     .ease(this.easing);
 
 
-        }
+        }*/
 
         this.x = x; this.y = y;
 
@@ -151,13 +151,13 @@ class Line{
         for(let i in this.data) {
         	this.svg.select("."+i)
                     .transition().duration(this.duration).ease(this.easing)
-                    .attr("d", line(this.data[i].data));
+                    .attr("d", line(this.data[i]));
 
         }
 
         for(let i in this.garbage) {
 			this.g_line[this.garbage[i].id].transition().duration(this.duration).ease(this.easing)
-				.attr("d", line(this.garbage[i].data));
+				.attr("d", line(this.garbage[i]));
 		}
 
         d3.transition(this.svg).select(".x.axis").duration(this.duration).ease(this.easing)

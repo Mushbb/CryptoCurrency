@@ -120,16 +120,23 @@
 
     let max_y = 150;
 	function setData(){
-		
-        for(let i in Price_day[formatDate(today)]){
-            teams[i].price = Price_day[formatDate(today)][i];
-            teams[i].percent = Price_day[formatDate(today)][i];
-            
-            if( teams[i].percent > max_y )
-                max_y = teams[i].price;
+		let dataset = [],       // {id, data = {up, right} }[]
+	        d = 0;
 
-			teams[i].price = "$"+teams[i].price.toFixed(2);
+        for(let i in Price_day[formatDate(today)]){
+            dataset[d] = [];
+            dataset[d].id = i;
+            dataset[d].data = [];
+            dataset[d].data.price = Price_day[formatDate(today)][i];
+            dataset[d].data.date = new Date(today);
+
+            d++;
+
+            if( Price_day[formatDate(today)][i] > max_y )
+                max_y = Price_day[formatDate(today)][i];
         }
+
+        //alert(dataset[0].id + dataset[0].data.date)
 
         if ( line.f_domain < beginday ) {
             line.f_domain = new Date(line.f_domain);
@@ -141,7 +148,7 @@
 
 		board.setText("end", "date", DisplayDate(today));
   
-		line.setData();
+		line.setData(dataset);
 		
         if( today > endday )
             return -1;
