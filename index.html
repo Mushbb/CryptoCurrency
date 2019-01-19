@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 
 <div class="btn-group">
-    <button type="button" class="btn btn-primary" onclick=auto(200)>Next</button>
+    <button type="button" class="btn btn-primary" onclick=auto(100)>Next</button>
 </div>
 
 <p id="chart">
@@ -108,32 +108,35 @@
     let standard = [];
 
     function start(){
-        line.f_domain = new Date(today).setDate(today.getDate()-30);
+        line.f_domain = new Date(today).setDate(today.getDate()-60);
         line.fy_domain = 0;
 
 		board.addGroup("end", 1400, 0);
 		board.addEndText("end", "date", 0, 0);
-		
+
+		preData();
         setData();
         line.begin();
     }
 
-    let max_y = 150;
+    let max_y = 1;
 	function setData(){
 		let dataset = [],       // {id, data = {up, right} }[]
-	        d = 0;
+	        d = 0,
+            newday = new Date(today);
+		newday.setDate(newday.getDate()+2);
 
-        for(let i in Price_day[formatDate(today)]){
+        for(let i in Price_day[formatDate(newday)]){
             dataset[d] = [];
             dataset[d].id = i;
             dataset[d].data = [];
-            dataset[d].data.price = Price_day[formatDate(today)][i];
-            dataset[d].data.date = new Date(today);
+            dataset[d].data.price = Price_day[formatDate(newday)][i];
+            dataset[d].data.date = new Date(newday);
 
             d++;
 
-            if( Price_day[formatDate(today)][i] > max_y )
-                max_y = Price_day[formatDate(today)][i];
+            if( Price_day[formatDate(newday)][i] > max_y )
+                max_y = Price_day[formatDate(newday)][i];
         }
 
         //alert(dataset[0].id + dataset[0].data.date)
@@ -154,6 +157,46 @@
             return -1;
         return 1;
 	}
+
+	function preData(){
+        let dataset = [],       // {id, data = {up, right} }[]
+            d = 0;
+
+        for(let i in Price_day[formatDate(today)]){
+            dataset[d] = [];
+            dataset[d].id = i;
+            dataset[d].data = [];
+            dataset[d].data.price = Price_day[formatDate(today)][i];
+            dataset[d].data.date = new Date(today);
+
+            d++;
+
+            if( Price_day[formatDate(today)][i] > max_y )
+                max_y = Price_day[formatDate(today)][i];
+        }
+
+        line.setData(dataset);
+
+        dataset = [];       // {id, data = {up, right} }[]
+        d = 0;
+        let newday = new Date(today);
+        newday.setDate(newday.getDate()+1);
+
+        for(let i in Price_day[formatDate(newday)]){
+            dataset[d] = [];
+            dataset[d].id = i;
+            dataset[d].data = [];
+            dataset[d].data.price = Price_day[formatDate(newday)][i];
+            dataset[d].data.date = new Date(newday);
+
+            d++;
+
+            if( Price_day[formatDate(newday)][i] > max_y )
+                max_y = Price_day[formatDate(newday)][i];
+        }
+
+        line.setData(dataset);
+    }
 
 	let interv;
 	function auto(period){

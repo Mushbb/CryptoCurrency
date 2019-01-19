@@ -38,6 +38,12 @@ svg {
 	stroke-width: 3;
 }
 
+.BTCd, .ETHd, .XRPd, .LTCd, .EOSd, .XLMd {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+
 .stext {
 	fill: #444444;
 	font: 15px Arial Narrow;
